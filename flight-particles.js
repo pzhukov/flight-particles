@@ -12,6 +12,7 @@
         this.particleSize = 8;
         this.particleColor = "rgb(70,70,70)";
         this.fadeDistance = 25;
+        this.drawParticleFunction = drawCircle;
 
         var self = this;
         this.drawCycle_ = new DrawCycle(function (time) {
@@ -78,13 +79,9 @@
             } else {
                 context.globalAlpha = 0.4 + 0.6 * particle.z / distanceBeforeFade;
             }
-            drawCircle(context, projected.x, projected.y, projectedSize);
+            this.drawParticleFunction(context, projected.x, projected.y, projectedSize);
         }
     };
-
-    function drawSquare(context, x, y, size) {
-        context.fillRect(x - size / 2, y - size / 2, size, size);
-    }
 
     function drawCircle(context, x, y, size) {
         context.beginPath();
