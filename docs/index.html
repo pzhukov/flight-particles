@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fly Particles</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.1/dat.gui.min.js"></script>
+    <script src="../flight-particles.js"></script>
+    <style>
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            margin: 0;
+            height: 100%;
+        }
+        .links {
+            background-color: rgba(255, 255, 255, 0.5);
+            font-family:  "Segoe UI", Arial;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="flight-particles" width="1200" height="600"></canvas>
+    <div class="links"><a href="https://github.com/pzhukov/flight-particles">Flight-particles on GitHub</a></div>
+    <script>
+        function updateCanvasSize () {
+            var documentStyle = window.getComputedStyle(document.body);
+            var width = parseInt(documentStyle.width);
+            var height = parseInt(documentStyle.height);
+            canvas.width = width;
+            canvas.height = height;
+            // to keep particles density independent of canvas size.
+            var volume = width * height * flightParticles.camera.distance;
+            flightParticles.particlesLimit = Math.round(previousLimit * volume  / previousVolume);
+            previousVolume = volume;
+            previousLimit = flightParticles.particlesLimit;
+        }
+        var canvas = document.getElementById("flight-particles");
+        var flightParticles = FlightParticles.init(canvas);
+        var previousVolume = canvas.width * canvas.height * flightParticles.camera.distance;
+        var previousLimit = flightParticles.particlesLimit;
+        updateCanvasSize();
+        window.addEventListener("resize", updateCanvasSize);
+
+        var settings = {
+            backgroundColor: "#ffffff"
+        };
+
+        var gui = new dat.gui.GUI();
+        gui.add(flightParticles, 'velocity').min(0).max(300).step(1);
+        gui.add(flightParticles, 'particlesLimit').min(0).max(3000).step(1).listen().onChange(function (newValue) {
+            previousLimit = newValue;
+        });
+        gui.add(flightParticles, 'particleSize').min(1).max(20).step(1);
+        gui.add(flightParticles, 'fadeDistance').min(0).max(80).step(1);
+        gui.addColor(flightParticles, 'particleColor');
+        gui.addColor(settings, 'backgroundColor').onChange(function (newValue) {
+            document.body.style.backgroundColor = newValue;
+        });
+        var cameraGui = gui.addFolder('Camera');
+        cameraGui.add(flightParticles.camera, 'center').min(1).max(100).step(0.5);
+        cameraGui.add(flightParticles.camera, 'distance').min(100).max(500).step(1);
+
+        flightParticles.start();
+    </script>
+</body>
+</html>
